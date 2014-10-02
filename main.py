@@ -86,7 +86,7 @@ class JiraToSprintlyConverter():
     def __init__(self,jir_users, spr_people):
         self.jir_user_map   = map_key( jir_users,  get_key=lambda x:x.emailAddress )
         self.spr_person_map = map_key( spr_people, get_key=lambda x:x.email )
-        self.jir_users      = map_key( jir_users, get_key=lambda x:x.key )
+        self.jir_users      = map_key( jir_users,  get_key=lambda x:x.key )
 
     def convert_issuetype(self,jira_issue):
         if len(jira_issue.raw['fields']['subtasks']) > 0:
@@ -218,8 +218,8 @@ class JiraToSprintlyImporter():
             raise BaseException( "Missing auth information" )
           
         if self.config['sprintly']['default_auth']: 
-            self.spr_client  = sprintly.Client( self.config['sprintly']['default_auth'], fake_create=dry_run)
-            self.spr_clients = { auth[0] : sprintly.Client( auth, fake_create=dry_run ) 
+            self.spr_client  = sprintly.Account( self.config['sprintly']['default_auth'], fake_create=dry_run)
+            self.spr_clients = { auth[0] : sprintly.Account( auth, fake_create=dry_run ) 
                                     for auth in (self.config['sprintly']['auth_map'] or {}).iteritems() }
         else: 
             print "Failed to generate sprintly client"
