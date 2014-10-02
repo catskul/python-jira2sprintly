@@ -335,7 +335,15 @@ class JiraToSprintlyImporter():
 
             jir_proj    = jir_proj_lookoup[jir_proj_name]
             print "Downloading JIRA items for [%s]"%jir_proj.name
-            jir_issues  = self.jir_client.search_issues('project=%s'%jir_proj.key)
+            jir_issues = []
+            results = 1
+            start = 0
+            while results:
+                results = self.jir_client.search_issues('project=%s'%jir_proj.key, startAt=start)
+                jir_issues += results 
+                start += len(results)
+                print "...got %i items..." % len(results)
+            
             print "Downloaded %i items"%len(jir_issues)
             spr_items   = spr_prod.items()
             spr_tag_map = multimap_multikey( spr_items, lambda x: x.tags )
