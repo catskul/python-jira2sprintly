@@ -148,11 +148,17 @@ class JiraToSprintlyConverter():
        
         spr_data = {} 
         spr_data['type']        = self.convert_issuetype( jira_issue )
-        spr_data['title']       = jira_issue.raw['fields']['summary']
-        #spr_data['who']
-        #spr_data['what']
-        #spr_data['why']
-        spr_data['description'] = jira_fields['description']
+        spr_data['description'] = jira_fields['description'] or ''
+        
+        if spr_data['type'] == 'story' :
+            parts = spr_data['description'].split()
+            parts = parts[:2] if len(parts) > 0 and len(parts[1]) > 3 else parts[:3]
+            spr_data['who']   = ' '.join(parts) or reporter
+            spr_data['what']  = jira_issue.raw['fields']['summary']
+            spr_data['why']   = spr_data['what']
+        else:
+            spr_data['title'] = jira_issue.raw['fields']['summary']
+
         #spr_data['score']       
         spr_data['status']      = self.convert_status(   jira_issue   )
         spr_data['assigned_to'] = self.lookup_person( jira_fields['assignee'] )
