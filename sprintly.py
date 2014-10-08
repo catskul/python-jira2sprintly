@@ -60,8 +60,8 @@ class Product(ApiThing):
     def create_person(self,data):
         return wrap( self.client.create_person(self.raw['id'],data), Person, self.client )
 
-    def items(self):
-        return wrap( self.client.items(self.raw['id']), Item, self.client )
+    def items(self,status=None):
+        return wrap( self.client.items(self.raw['id'],status), Item, self.client )
 
     def create_item(self,data,client=None):
         client = client or self.client
@@ -179,12 +179,13 @@ class Client:
         data = { 'name' : name }
         return self.api_post("products.json",data)
 
-    def items(self, product_id):
+    def items(self, product_id, status=None):
         params = {
             'status' : 'someday,backlog,in-progress,completed,accepted',
             'limit'  : 100,
             'offset' : 0,
         }
+        params['status'] = status or params['status']
         data = []
         count = 1
         while count > 0:
@@ -213,10 +214,10 @@ class Client:
         if item_number == -1 or item_number == -1:
             return []
         else:
-            return self.api_get("products/%s/items/%s/comments.json"%(product_id,item_number),Comment)
+            return self.api_get("products/%s/items/%s/comments.json"%(product_id,item_number))
 
     def create_comment(self,product_id, item_number, data):
-        return self.api_post("products/%s/items/%s/comments.json"%(product_id,item_number),Comment,data)
+        return self.api_post("products/%s/items/%s/comments.json"%(product_id,item_number),data)
 
     def people(self, product_id): 
         return self.api_get("products/%s/people.json"%product_id)
